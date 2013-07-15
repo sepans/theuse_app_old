@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title> double standard</title>
+        
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no;" />
+        <meta charset="utf-8">
+            
+            
+
+            
+            <style>
+                
+                * {
+                    -webkit-overflow-scrolling: none;
+                }
+                
+                body {
+                    background-color:#FFF;
+                    background-image: url('audio/carbonFiber.png');
+                    font-size: 14px;
+                    font-family: arial, sans-serif;
+                    margin: 0;
+                    padding: 0;
+                   /* margin-left: 200px;*/
+                   
+                   /*overflow-y: hidden; */
+                    
+                    
+                }
+               /* 
+                div {border: 1px solid black;}
+                ul {border: 1px solid red;}
+                */
+                h1, h2 {
+                    font-weight: normal;
+                    font-size: 1em;
+                }
+                
+                #test-vis {
+                    position: absolute;
+                    width: 384px;
+                    height: 567px;
+                    border: 1px solid #555;
+                    z-index: -1;
+                
+                }
+                
+                #text-container {
+                    width: 250px;
+                    text-align: justify;
+                    height: 90%;
+                    position: absolute;
+                    top: 10px;
+                    left: 10px;
+                    background-color: rgba(355,255,255,0.7);
+                    /*display: none;*/
+                    max-height: 530px; 
+                    overflow-y: scroll;
+                    padding: 5px;
+                }
+
+                #video-container {
+                    width: 250px;
+                   
+                    height: 90%;
+                    position: absolute;
+                    top: 0px;
+                    left: 800px;
+                }
+                
+                #items-list {
+                    position: absolute;
+                    left: 400px;
+                    width: 400px;
+                    padding: 5px;
+                    
+                    
+                }
+                
+                .item {
+                    float: left;
+                    margin: 4px 2px;
+                    clear: right;
+                }
+                
+                .rect {
+                	width: 35px; height: 6px; background-color: #aaa; display: inline-block; 
+                	
+                }
+                
+                .circ a {
+                	width: 10px; 
+                	height: 10px;
+                	 background-color: #aaa; 
+                	 display: block; 
+                	 margin: 20px auto 5px auto;
+                	border-radius: 4px;
+                }	
+                
+                ul {
+                	list-style: none;
+                	margin: 0;
+                	padding: 0;
+                	
+                }
+                /*
+                #item-youknow {
+                    max-height: 600px;
+                     left: -200px !important;
+                     top: 0 !important;
+                    
+                }
+                #item-youknow .segments { width: 180px;}
+                
+                #item-youknow .circ { display: inline-block; margin: 5px;   }
+                
+                #item-youknow .rect { margin-left: 147px;}
+                
+                #item-dunno {
+                     left: 390px !important;
+                     top: 0 !important;
+                
+                }
+                #item-dunno .segments { width: 180px;}
+                
+                #item-dunno .circ { display: inline-block; margin: 5px;   }
+                */
+                
+                #youarehere {
+                    position: absolute;
+                    left: 50px;
+                    top: 50px;
+                    background: url(img/youarehere.gif) 0 0 no-repeat;
+                    width: 200px;
+                    height: 200px;
+                    z-index: 1;
+                    top: 100px;
+                }
+
+                </style>
+            </head>
+    <body id="theuse">
+    
+        
+        <div id="youarehere"></div>
+
+        <ul  id="items-list">
+        
+        </ul>
+     
+     <div id="text-container"><h2></h2><p></p></div>
+     <div id="video-container"></div>
+     
+    <script type="text/javascript" charset="utf-8" src="js/jquery-2.0.2.min.js"></script>
+    <script type="text/javascript" charset="utf-8" src="js/masonry.pkgd.min.js"></script>
+    <script type="text/javascript" charset="utf-8" src="js/data.js"></script>
+   
+    <script type="text/javascript" charset="utf-8" src="cordova.js"></script>
+    <script type="text/javascript" charset="utf-8" src="js/PGLowLatencyAudio.js"></script>
+    <script type="text/javascript" charset="utf-8" src="js/jquery.mobile-1.3.1.min.js"></script>
+   
+    
+    <script type="text/javascript">
+        console.log('js');
+        
+        
+        
+        var device = {};
+        
+        var playCount = 0;
+        
+        var rand_segment = [];
+        var STATE_INIT =0, STATE_PLAY = 1, STATE_PAUSE = 2;
+        
+        
+        $('#theuse').bind('pageinit', function(event) {
+        	console.log('init');
+
+		
+		    console.log('ready');
+		    document.addEventListener("deviceready", onBodyLoad, false);  // change to web
+
+
+
+//			onBodyLoad();
+		});
+		
+		$(document).ready(function() {
+		
+
+			//onBodyLoad(); // change to web
+		});
+		
+		function scrollRight(scroll) {
+		    console.log('sl '+$('body').scrollLeft());
+		    var position = Math.floor(($('body').scrollLeft()+100)/device.pageWidth);
+		    console.log('position '+position);
+		    var scrollLeft = scroll!=undefined ? scroll :  Math.min((position+1)*device.pageWidth , device.pageWidth*2 );
+		    if($('body').scrollLeft()<2*device.pageWidth) {
+                $('html, body').animate({
+                        scrollLeft: scrollLeft
+                });
+            }
+		}
+
+		function scrollLeft(scroll) {
+		    console.log('sr '+$('body').scrollLeft());
+		    var position = Math.floor(($('body').scrollLeft()+100)/device.pageWidth);
+		    console.log('position '+position);
+		    var scrollLeft = scroll!=undefined ? scroll :  Math.max((position-1)*device.pageWidth,0);
+		    if($('body').scrollLeft()>0) {
+                $('html, body').animate({
+                        scrollLeft: scrollLeft
+                });
+            }
+		}
+        
+        
+        
+        function onBodyLoad()
+        {		
+           // document.addEventListener("deviceready", onDeviceReady, false);
+		    device.pageWidth = $(window).width();
+		    device.pageHeight = $(window).height();
+		    
+		    console.log('width '+device.pageWidth+' height '+device.pageHeight);
+		    
+		   // $('body').css('margin-left',device.pageWidth);
+		    $('body').css('height',device.pageHeight);
+
+
+		    $('#text-container').css('width',device.pageWidth-30);
+		    $('#text-container').css('height',device.pageHeight-20);
+
+		    $('#video-container').css('width',device.pageWidth-20);
+		    $('#video-container').css('left',2*device.pageWidth);
+		    
+		    $('#items-list').css('width',device.pageWidth-20);
+		    $('#items-list').css('left',device.pageWidth);
+
+		    $('#youarehere').css('left',device.pageWidth*1.2);
+
+		    
+		     $(document).on("swiperight", function() {
+               // console.log('swipe');
+                 scrollLeft();
+            });
+		     $(document).on("swipeleft", function() {
+               // console.log('swipe');
+                 scrollRight();
+            });
+            
+            
+            scrollRight();
+
+		    
+            for(var i=0;i<content_info.length;i++) {
+            	//console.log(content_info[i].display_title);
+            	
+            	
+
+            	
+            	var item;
+                item = '<li class="item" id="item-'+i+'"><a href="#" class="rect" onclick="opentext('+i+')"></a><ul class="segments">';
+                if(content_info[i].title=='youknow' || content_info[i].title=='dunno') {
+                    item=item+'<li class="circ seg" ><a href="#" class="circ" onclick="play_track('+i+');"><input class="state" type="hidden" value="0"/></a></li>';
+                
+                }
+                else {
+
+                    for(var j=0;j<content_info[i].segments.length;j++) {
+                        item=item+'<li class="circ seg-'+j+'"><a href="#" class="circ" onclick="play_track('+i+','+j+');"><input class="state" type="hidden" value="0"/></a></li>';
+                    }
+                }
+	            item=item+'</ul></li>';
+	           // console.log(item);
+	           
+	           
+	          
+	           
+            	$('#items-list').append(item);
+            } 
+            var container = document.querySelector('#items-list');
+            var msnry = new Masonry(  container, {
+                  columnWidth: 24,
+                  itemSelector: '.item'
+            });
+        }
+        
+        function opentext(item) {
+            $('#text-container h2').text(content_info[item].display_title);
+            $('#text-container p').text(content_info[item].body);
+           // $('#text-container').show();
+            scrollLeft(0);
+        
+        }
+        
+        function onDeviceReady()
+        {
+            // do your thing!
+        //    alert('ready');
+        }
+        
+        function play_track(item,segment) {
+        
+            console.log(item);
+            
+            var button= $('#item-'+item+' .seg-'+segment+' a.circ');
+            var state=$('#item-'+item+' .seg-'+segment+' .state');
+
+            if(segment==undefined) {
+               segment = rand_segment[item]!=undefined ? rand_segment[item] : Math.round(Math.random()*content_info[item].segments.length);
+               rand_segment[item] = segment;
+               console.log('rand seg '+segment);
+
+               button= $('#item-'+item+' .seg a.circ');
+               state=$('#item-'+item+' .seg .state');
+            
+            }
+            
+            
+            var filename = content_info[item].segments[segment];
+            
+            
+            var audio_id = 'item-'+item+'-seg-'+segment;
+            
+            console.log(filename);
+            console.log(audio_id);
+            
+            if(state.val()==STATE_INIT) {
+                PGLowLatencyAudio.preloadAudio(audio_id, content_info[item].segments[segment], 1, function(result) { // success
+                 /* 
+                    seems success callback doesnt work. play after that works
+                  
+                    alert(result);
+                    alert('playing '+audio_id+' '+filename);
+                    PGLowLatencyAudio.play(audio_id, function(error) {alert(error);},function(msf) {alert(msg);}  );
+                 //   PGLowLatencyAudio.play(audio_id);
+                 
+                 */
+              
+              }, function(error) { // error
+                    alert('error audio file not found in the app '+audio_id+' '+filename);
+              
+              });
+
+                    //alert('playing '+audio_id+' '+filename);
+                    if(playCount==0) {
+                   		 PGLowLatencyAudio.volume(audio_id,1,0);
+                   	}
+                    else if(playCount==1) {
+                   		 PGLowLatencyAudio.volume(audio_id,0,1);
+                   	}
+                   	playCount++;
+                    PGLowLatencyAudio.play(audio_id, function(error) {alert(error);},function(msf) {alert(msg);}  );
+        
+                button.css('background-color','#F00');
+                state.val(STATE_PLAY);
+            } 
+            else if (state.val()==STATE_PLAY) {    // pausing
+                
+                button.css('background-color','#0F0');
+                state.val(STATE_PAUSE);
+                
+                PGLowLatencyAudio.stop(audio_id);
+                
+                setTimeout(function() {
+                    if(state.val()==STATE_PAUSE) {
+                        cleanup(audio_id,item,button,state);
+                    }
+                    
+                    
+                },15000);   // unloading after 15 sec 
+
+            
+            }
+            else if (state.val()==STATE_PAUSE) {    // resuming
+                button.css('background-color','#F00');
+                state.val(STATE_PLAY);
+
+                PGLowLatencyAudio.play(audio_id);
+            
+            }
+            console.log(segment);
+            
+        
+        }
+        
+        
+        function cleanup(audio_id,item,button,state) {
+
+            console.log('unloading '+audio_id);
+            button.css('background-color','#aaa');
+            PGLowLatencyAudio.unload(audio_id);
+            state.val(STATE_INIT);
+            if(rand_segment[item]!=undefined) {
+                rand_segment[item]=undefined;
+            }
+
+        
+        }
+        
+        
+  
+        
+        
+        
+    </script>
+   
+    </body>
+    
+    
+    
+</html>
